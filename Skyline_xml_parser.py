@@ -4,7 +4,10 @@
 #This script parses a bunch of Skyline .xml reports and makes a data table from them
 ####
 
-import sys, re, glob, time
+import sys
+import re
+import glob
+import time
 
 def usage():
 	print ('Usage:')

@@ -1,0 +1,55 @@
+library(Biobase)
+BiocManager::install("GEOquery", site_repository = 'https://cran.ma.imperial.ac.uk/')
+require(GEOquery)
+
+gep <- read.csv("score_probeIDs.csv", header = FALSE, quote = "")
+names(gep) <- c('score', 'probe')
+
+gset <- getGEO("GSE12056", GSEMatrix =TRUE, getGPL=FALSE)
+if (length(gset) > 1) idx <- grep("GPL570", attr(gset, "names")) else idx <- 1
+gset <- gset[[idx]]
+
+BiocManager::install("biomaRt", site_repository = 'https://cran.ma.imperial.ac.uk/')
+require("biomaRt")
+mart <- useMart("ENSEMBL_MART_ENSEMBL")
+mart <- useDataset("hsapiens_gene_ensembl", mart)
+#gets details from the probeID
+annotLookup <- getBM(mart=mart, attributes=c("affy_hg_u133_plus_2", "ensembl_gene_id", "gene_biotype", "external_gene_name"), filter="affy_hg_u133_plus_2", values=gep$probe, uniqueRows=TRUE)
+
+#gets details from the gene name
+annotLookup <- getBM(mart=mart, attributes=c("affy_hg_u133_plus_2", "ensembl_gene_id", "gene_biotype", "external_gene_name"), filter="external_gene_name", values= TAQMANgenes, uniqueRows=TRUE)
+
+
+genes <- c("LDHA", "NME1", "NPM1", "HSPE1", "HSPD1", "ENO1", "FKBP4")
+
+
+TAQMANgenes <- c("FGFR3", "CCND1", "CCND3", "NSD2", "MAF", "MAFB", "ITGB7", "CX3CR1")
+
+   affy_hg_u133_plus_2 ensembl_gene_id   gene_biotype external_gene_name
+1          208711_s_at ENSG00000110092 protein_coding              CCND1
+2            208712_at ENSG00000110092 protein_coding              CCND1
+3                      ENSG00000110092 protein_coding              CCND1
+4            205898_at ENSG00000168329 protein_coding             CX3CR1
+5                      ENSG00000168329 protein_coding             CX3CR1
+6          204379_s_at ENSG00000068078 protein_coding              FGFR3
+7          204380_s_at ENSG00000068078 protein_coding              FGFR3
+8                      ENSG00000068078 protein_coding              FGFR3
+9          209052_s_at ENSG00000109685 protein_coding               NSD2
+10         209053_s_at ENSG00000109685 protein_coding               NSD2
+11         209054_s_at ENSG00000109685 protein_coding               NSD2
+12                     ENSG00000109685 protein_coding               NSD2
+13         222777_s_at ENSG00000109685 protein_coding               NSD2
+14           223472_at ENSG00000109685 protein_coding               NSD2
+15         222778_s_at ENSG00000109685 protein_coding               NSD2
+16         209347_s_at ENSG00000178573 protein_coding                MAF
+17           206363_at ENSG00000178573 protein_coding                MAF
+18        1566324_a_at ENSG00000178573 protein_coding                MAF
+19         209348_s_at ENSG00000178573 protein_coding                MAF
+20           201700_at ENSG00000112576 protein_coding              CCND3
+21                     ENSG00000112576 protein_coding              CCND3
+22         222670_s_at ENSG00000204103 protein_coding               MAFB
+23         218559_s_at ENSG00000204103 protein_coding               MAFB
+24           205718_at ENSG00000139626 protein_coding              ITGB7
+25                     ENSG00000139626 protein_coding              ITGB7
+
+TAQMANProbes <- c("208711_s_at", "208712_at", "205898_at", "204379_s_at", "204380_s_at", "209052_s_at", "209053_s_at", "209054_s_at", "222777_s_at", "223472_at", "222778_s_at", "209347_s_at", "206363_at", "1566324_a_at", "209348_s_at", "201700_at", "222670_s_at", "218559_s_at", "205718_at")
